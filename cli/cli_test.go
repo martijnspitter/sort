@@ -15,7 +15,7 @@ func TestParseFlags(t *testing.T) {
 	}{
 		{
 			name: "valid filepath with unique flag",
-			args: []string{"program", "testdata/input.txt", "-u"},
+			args: []string{"testdata/input.txt", "-u"},
 			want: Config{
 				FilePath: "testdata/input.txt",
 				Unique:   true,
@@ -24,7 +24,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name: "valid filepath without unique flag",
-			args: []string{"program", "testdata/input.txt"},
+			args: []string{"testdata/input.txt"},
 			want: Config{
 				FilePath: "testdata/input.txt",
 				Unique:   false,
@@ -33,7 +33,7 @@ func TestParseFlags(t *testing.T) {
 		},
 		{
 			name:     "missing filepath",
-			args:     []string{"program"},
+			args:     []string{},
 			want:     Config{},
 			wantErr:  true,
 			errorMsg: "filepath is required",
@@ -42,7 +42,15 @@ func TestParseFlags(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseFlags(tt.args)
+			filePath := ""
+			if len(tt.args) > 0 {
+				filePath = tt.args[0]
+			}
+			uniq := false
+			if len(tt.args) > 1 {
+				uniq = true
+			}
+			got, err := ParseFlags(filePath, uniq)
 
 			// Check if we expected an error
 			if tt.wantErr {
